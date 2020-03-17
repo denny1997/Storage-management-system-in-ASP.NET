@@ -1,0 +1,445 @@
+﻿@model IEnumerable<Miao_studio.Models.stock>
+
+@{
+    ViewBag.Title = "Index";
+    int i = 1;
+}
+
+<h2>库存</h2>
+
+<p>
+    <a href="/Stock/Input">新增入库</a>    
+</p>
+
+<table class="table" style="padding-right:17px">
+    <tr>
+        <th style="width:50px;text-align:center">
+            <label>序号</label>
+        </th>
+        <th style="width:350px;text-align:center">
+            <label>名称</label>
+        </th>
+        <th style="width:100px;text-align:center">
+            <label>型号</label>
+        </th>
+        <th style="width:100px;text-align:center">
+            <label>单位</label>
+        </th>
+        <th style="width:100px;text-align:center">
+            <label>库存</label>
+        </th>
+        <th style="width:100px;text-align:center">
+            <label>总金额</label>
+        </th>
+        <th>
+            <label>操作</label>
+        </th>
+    </tr>
+</table>
+
+<div style="overflow-y:scroll;height:450px">
+    <table class="table">
+        @foreach (var item in Model)
+        {
+            if (item.stock1 >= 0)
+            {
+                <tr>
+                    <td style="width:50px;text-align:center">
+                        <p>@i</p>
+                    </td>
+                    <td style="width:350px;text-align:center">
+                        @Html.DisplayFor(modelItem => item.name)
+                    </td>
+                    <td style="width:100px;text-align:center">
+                        @Html.DisplayFor(modelItem => item.type)
+                    </td>
+                    <td style="width:100px;text-align:center">
+                        @Html.DisplayFor(modelItem => item.unit)
+                    </td>
+                    <td style="width:100px;text-align:center">
+                        @Html.DisplayFor(modelItem => item.stock1)
+                    </td>
+                    <td style="width:100px;text-align:center">
+                        @Html.DisplayFor(modelItem => item.total)
+                    </td>
+                    <td>
+                        <button class="btn btn-default" onclick="addOutput('@item.id.ToString()','@item.name.ToString()','@item.type.ToString()','@item.unit.ToString()');">出库</button>
+                        <!--<button class="btn btn-default show-layer-output" data-name="@item.name.ToString()" data-type="@item.type.ToString()" data-unit="@item.unit.ToString()" data-id="@item.id">出库</button>-->
+                        <button class="btn btn-default" onclick="addInput('@item.name.ToString()','@item.type.ToString()','@item.unit.ToString()');">入库</button>
+                        <!--<button class="btn btn-default show-layer-input" data-name="@item.name.ToString()" data-type="@item.type.ToString()" data-unit="@item.unit.ToString()">入库</button>-->
+                        <!--<button class="btn btn-default" onclick="detail(@item.id)">查看库存明细</button>-->
+                        <button class="btn btn-default show-layer-detail" data-id="@item.id">查看库存明细</button>
+                    </td>
+                </tr>
+                i += 1;
+            }
+
+
+        }
+    </table>
+</div>
+
+<div class="hw-overlay" id="hw-layer-detail">
+    <div class="hw-layer-wrap">
+        <h2>库存明细</h2>
+        <span class="glyphicon glyphicon-remove hwLayer-close"></span>
+        <div class="row">
+            <div class="col-md-3 col-sm-12 hw-icon">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </div>
+            <div class="col-md-9 col-sm-12">
+                <p id="layer-detail"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hw-overlay" id="hw-layer-input">
+    <div class="hw-layer-wrap">
+        <h2>入库</h2>
+        <span class="glyphicon glyphicon-remove hwLayer-close"></span>
+        <div class="row">
+            <div class="col-md-3 col-sm-12 hw-icon">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </div>
+            <div class="col-md-9 col-sm-12">
+                <div class="form-horizontal">
+                    <hr />
+
+                    <div class="form-group">
+                        <label class="col-md-2">名称</label>
+                        <div class="col-md-10">
+                            <p style="display:inline" id="name-input"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">型号</label>
+                        <div class="col-md-10">
+                            <p id="type-input" style="display:inline"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">单位</label>
+                        <div class="col-md-10">
+                            <p id="unit-input" style="display:inline"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">数量</label>
+                        <div class="col-md-10">
+                            <input type="number" id="number-input" class="form-control" value="1" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">单价</label>
+                        <div class="col-md-10">
+                            <input type="number" id="price-input" class="form-control" value="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">供应商</label>
+                        <div class="col-md-10">
+                            <input type="text" id="provider-input" class="form-control" value="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">签收人</label>
+                        <div class="col-md-10">
+                            <input type="text" id="signer-input" class="form-control" value="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">入库日期</label>
+                        <div class="col-md-10">
+                            <input type="date" id="time-input" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <button class="btn btn-default" onclick="checkInput();">确认入库</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hw-overlay" id="hw-layer-output">
+    <div class="hw-layer-wrap">
+        <h2>出库</h2>
+        <span class="glyphicon glyphicon-remove hwLayer-close"></span>
+        <div class="row">
+            <div class="col-md-3 col-sm-12 hw-icon">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </div>
+            <div class="col-md-9 col-sm-12">
+                <div class="form-horizontal">
+                    <hr />
+
+                    <div class="form-group">
+                        <label class="col-md-2">名称</label>
+                        <div class="col-md-10">
+                            <p style="display:inline" id="name-output"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">型号</label>
+                        <div class="col-md-10">
+                            <p id="type-output" style="display:inline"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">单位</label>
+                        <div class="col-md-10">
+                            <p id="unit-output" style="display:inline"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">数量</label>
+                        <div class="col-md-10">
+                            <input type="number" id="number-output" class="form-control" value="1" />
+                        </div>
+                    </div>                    
+
+                    <div class="form-group">
+                        <label class="col-md-2">工程</label>
+                        <div class="col-md-10">
+                            <input type="text" id="project-output" class="form-control" value="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2">出库日期</label>
+                        <div class="col-md-10">
+                            <input type="date" id="time-output" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="id-output" value=""/> 
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <button class="btn btn-default" onclick="checkOutput();">确认出库</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        //展示层
+        function showLayer(id) {
+            var layer = $('#' + id),
+                layerwrap = layer.find('.hw-layer-wrap');
+            layer.fadeIn();
+            //屏幕居中
+            layerwrap.css({
+                'margin-top': -layerwrap.outerHeight() / 2
+            });
+        }
+
+        //隐藏层
+        function hideLayer() {
+            $('.hw-overlay').fadeOut();
+        }
+
+        $('.hwLayer-ok,.hwLayer-cancel,.hwLayer-close').on('click', function () {
+            hideLayer();
+        });
+
+        //触发弹出层
+        $('.show-layer-detail').on('click', function () {
+            var id = $(this).data('id');
+            //showLayer(layerid);
+            detail(id);
+            showLayer("hw-layer-detail");
+        });
+
+        $('.show-layer-input').on('click', function () {
+            //var id = $(this).data('show-layer');
+            //showLayer(layerid);
+            //detail(id);
+            var name = $(this).data('name');
+            var type = $(this).data('type');
+            var unit = $(this).data('unit');            
+            $('#name-input').html(name);
+            $('#type-input').html(type);
+            $('#unit-input').html(unit);
+            showLayer("hw-layer-input");
+        });
+
+        $('.show-layer-output').on('click', function () {            
+            var name = $(this).data('name');
+            var type = $(this).data('type');
+            var unit = $(this).data('unit');
+            var id = $(this).data('id');
+            $('#name-output').html(name);
+            $('#type-output').html(type);
+            $('#unit-output').html(unit);
+            $('#id-output').val(id);
+            showLayer("hw-layer-output");
+        });
+
+        //点击或者触控弹出层外的半透明遮罩层，关闭弹出层
+        $('.hw-overlay').on('click', function (event) {
+            if (event.target == this) {
+                hideLayer();
+            }
+        });
+
+        //按ESC键关闭弹出层
+        $(document).keyup(function (event) {
+            if (event.keyCode == 27) {
+                hideLayer();
+            }
+        });
+    });
+</script>
+
+
+<script>
+
+    function addInput(name, type, unit) {
+        window.location.href = '/Stock/AddInput?name=' + name + '&type=' + type + '&unit=' + unit;
+    }
+
+    function addOutput(id, name, type, unit) {
+        window.location.href = '/Stock/AddOutput?id=' + id + '&name=' + name + '&type=' + type + '&unit=' + unit;
+    }
+
+    function detail(id) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", "@Url.Action("StockDetail","Stock")", false);
+        var data = new FormData();
+        data.append("id", id.toString());        
+        xhr.send(data);
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+            $('#layer-detail').html(xhr.responseText);
+            //alert(xhr.responseText);
+            //window.location.reload();
+        } else {
+            $('#layer-detail').html("请求失败，错误码：" + xhr.status);
+            //alert("Request was unsuccessful: " + xhr.status);
+        }
+    }
+
+    function checkInput() {
+        var number = $("#number-input").val();
+        if (number == null) {
+            alert("数量不能为空");
+            return;
+        }
+        var num = parseInt(number);
+        if ((isNaN(number)) || (num <= 0)) {
+            alert("输入不合法");
+            return;
+        }
+        var price = $("#price-input").val();
+        if (price == null) {
+            alert("价格不能为空");
+            return;
+        }
+        var prc = parseFloat(price);
+        if ((isNaN(price)) || (prc <= 0)) {
+            alert("输入不合法");
+            return;
+        }
+        var provider = $("#provider-input").val();
+        if (provider == null) {
+            alert("供应商不能为空");
+            return;
+        }
+        var signer = $("#signer-input").val();
+        
+        var time = $("#time-input").val();
+        if (time == null) {
+            alert("签收日期不能为空");
+            return;
+        }
+
+        var name = $("#name-input").html();
+        var type = $("#type-input").html();
+        var unit = $("#unit-input").html();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", "@Url.Action("Input","Stock")", false);
+        var data = new FormData();
+        data.append("name", name.toString());
+        data.append("type", type.toString());
+        data.append("number", number);
+        data.append("price", price);
+        data.append("time", time);
+        data.append("provider", provider);
+        data.append("unit", unit.toString());
+        data.append("signer", signer);
+        xhr.send(data);
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+            //window.location.reload();
+            alert("入库成功");            
+        } else {
+            alert("入库失败");
+        }
+        $('.hw-overlay').fadeOut();
+        window.location.reload();
+    }
+
+    function checkOutput() {
+        var number = $("#number-output").val();
+        if (number == null) {
+            alert("数量不能为空");
+            return;
+        }
+        var num = parseInt(number);
+        if ((isNaN(number)) || (num <= 0)) {
+            alert("输入不合法");
+            return;
+        }
+        var project = $("#project-output").val();
+        if (project == null) {
+            alert("工程不能为空");
+            return;
+        }
+        var time = $("#time-output").val();
+        if (time == null) {
+            alert("出库日期不能为空");
+            return;
+        }
+         
+        var id = $("#id-output").val();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", "@Url.Action("Output","Stock")", false);
+        var data = new FormData();
+        data.append("Id", id.toString());
+        data.append("number", num.toString());
+        data.append("project", project)
+        data.append("time", time);
+        xhr.send(data);
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+            alert(xhr.responseText);
+        } else {
+            alert("出库失败");
+        }
+        $('.hw-overlay').fadeOut();
+        window.location.reload();
+    }
+</script>
+
+

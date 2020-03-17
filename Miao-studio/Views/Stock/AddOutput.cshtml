@@ -1,0 +1,105 @@
+﻿
+@model Miao_studio.Models.input
+
+@{
+    ViewBag.Title = "Input";
+}
+<h2>出库</h2>
+
+<form action="/Stock/Output" method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @Html.EditorFor(model => model.Id, new { htmlAttributes = new { @id = "id-output", @type = "hidden" } })
+
+        <div class="form-group">
+            <label class="control-label col-md-2">名称</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "form-control", @id = "name-output", @readonly = "readonly" } })
+                @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">型号</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.type, new { htmlAttributes = new { @class = "form-control", @id = "type-output", @readonly = "readonly" } })
+                @Html.ValidationMessageFor(model => model.type, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">单位</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.unit, new { htmlAttributes = new { @class = "form-control", @id = "unit-output", @readonly = "readonly" } })
+                @Html.ValidationMessageFor(model => model.unit, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">数量</label>
+            <div class="col-md-10">
+                <input type="number" id="number-output" class="form-control" name="number" value="1" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">工程</label>
+            <div class="col-md-10">
+                <input type="text" id="project-output" class="form-control" name="project" value="" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">出库日期</label>
+            <div class="col-md-10">
+                <input type="date" id="time-output" class="form-control" name="time" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button class="btn btn-default" onclick="return checkOutput();">确认出库</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    @Html.ActionLink("返回", "Index")
+</div>
+
+<script>
+    function checkOutput() {
+        var number = $("#number-output").val();
+        if (number == null || number =="") {
+            alert("数量不能为空");
+            return false;
+        }
+        var num = parseInt(number);
+        if ((isNaN(number)) || (num <= 0)) {
+            alert("输入不合法");
+            return false;
+        }
+        var project = $("#project-output").val();
+        if (project == null || project == "") {
+            alert("工程不能为空");
+            return false;
+        }
+        var time = $("#time-output").val();
+        if (time == null || time == "") {
+            alert("出库日期不能为空");
+            return false;
+        }
+         
+        return true;
+    }
+</script>
+
+
+
+

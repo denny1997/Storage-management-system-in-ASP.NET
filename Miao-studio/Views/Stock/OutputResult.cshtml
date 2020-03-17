@@ -1,0 +1,200 @@
+﻿@model Tuple<IEnumerable<Miao_studio.Models.out_put>,Miao_studio.Models.SearchInfo>
+@using Miao_studio.Models;
+@{
+    ViewBag.Title = "OutputResult";
+    decimal totalAmount = 0;
+    string begin = "";
+    string end = "";
+    int i = 1;
+    if (Model.Item2.begin != null)
+    {
+        begin = Model.Item2.begin.Value.ToString("yyyy-MM-dd");
+    }
+    if (Model.Item2.end != null)
+    {
+        end = Model.Item2.end.Value.ToString("yyyy-MM-dd");
+    }
+    List<out_put> res = new List<out_put>();
+}
+
+<h2>出库记录查询</h2>
+<br />
+
+
+<form action="/Stock/OutputResult" method="get" accept-charset="UTF-8">
+    <div class="form-group">
+        <label class="control-label col-md-2">出库单编号：</label>
+        <input name="id" class="form-control" value="@Model.Item2.id" />
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">名称：</label>
+        <input name="name" class="form-control" value="@Model.Item2.name" />
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">型号：</label>
+        <input name="type" class="form-control" value="@Model.Item2.type" />
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">开始时间：</label>
+        <input type="date" name="begin" class="form-control" value="@begin" />
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">结束时间：</label>
+        <input type="date" name="end" class="form-control" value="@end" />
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">项目：</label>
+        <input name="project" class="form-control" value="@Model.Item2.project" />
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2"></label>
+        <input type="submit" value="查询" class="btn btn-default form-control" style="background-color:skyblue" />
+    </div>
+</form>
+
+    <table class="table" style="table-layout:fixed">
+        <tr>
+            <th>
+                <label>序号</label>
+            </th>
+            <th>
+                <label>出库单编号</label>
+            </th>
+            <th>
+                <label>名称</label>
+            </th>
+            <th>
+                <label>型号</label>
+            </th>
+            <th>
+                <label>日期</label>
+            </th>
+            <th>
+                <label>操作人</label>
+            </th>
+            <th>
+                <label>项目</label>
+            </th>
+            <th>
+                <label>数量</label>
+            </th>
+            <th>
+                <label>单位</label>
+            </th>
+            <th>
+                <label>总金额</label>
+            </th>
+            <th>
+                <label>金额明细</label>
+            </th>
+            <th>
+                <label>操作</label>
+            </th>
+            <th>
+                <button class="btn btn-default" style="background-color:red" onclick="window.location = '/Stock/ExportOutputResult'">导出</button>
+            </th>
+        </tr>
+    </table>
+
+<div style="overflow-y:scroll;height:300px">
+    <table class="table" style="table-layout:fixed">
+        @foreach (var item in Model.Item1)
+        {
+        <tr>
+            <td>
+                <p>@i</p>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.type)
+            </td>
+            <td onclick="modify('@item.Id.ToString()',1)" onmouseover="this.style.color = 'red'" onmouseout="this.style.color = 'black'">
+                <p>@item.time.ToLongDateString()</p>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item._operator)
+            </td>
+            <td onclick="modify('@item.Id.ToString()',2)" onmouseover="this.style.color = 'red'" onmouseout="this.style.color = 'black'">
+                @Html.DisplayFor(modelItem => item.project)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.unit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.total)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.detail)
+            </td>
+            <td>
+                <button class="btn btn-default" style="background-color:red" onclick="del('@item.Id.ToString()')">删除</button>
+            </td>
+            <td></td>
+        </tr>
+            totalAmount += item.total;
+            i += 1;
+            res.Add(item);
+        }
+        
+    </table>
+</div>
+@{ 
+    Session["excelOutput"] = res;
+}
+
+    <h2>总计：￥@totalAmount</h2>
+
+<script>
+    function del(id) {
+        if (confirm("确认删除吗？")) {            
+            var xhr = new XMLHttpRequest();
+            xhr.open("get", '/Stock/OutputDelete?id=' + id.toString(), false);            
+            xhr.send(null);
+            if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                alert(xhr.responseText);
+                window.location.reload();
+            } else {
+                alert("修改失败");
+            }
+        }
+    }
+
+    function modify(id,type) {
+        var para
+        switch (type) {
+            case 1:
+                para = prompt("请输入出库日期（如 2000-08-01）")
+                if (para == null) {
+                    return
+                }
+                break
+            case 2:
+                para = prompt("请输入工程名称")
+                if (para == null) {
+                    return
+                }
+                break
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open("post", "@Url.Action("OutputModify","Stock")", false);
+        var data = new FormData();
+        data.append("id", id.toString());
+        data.append("para", para.toString());
+        data.append("type", type);
+        xhr.send(data);
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+            alert(xhr.responseText);
+            window.location.reload();
+        } else {
+            alert("修改失败");
+        }
+    }
+</script>
